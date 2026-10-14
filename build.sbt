@@ -3,9 +3,6 @@ ThisBuild / organization := "io.github.dfurmans"
 ThisBuild / scalaVersion := "3.3.7"
 ThisBuild / versionScheme := Some("early-semver")
 
-// Tell sbt-sonatype to use the new Central Portal
-ThisBuild / sonatypeCredentialHost := "central.sonatype.com"
-
 val OidcNimbusdsSDKVersion = "11.38.2"
 
 // Root Project (The Library)
