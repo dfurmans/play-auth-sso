@@ -1,7 +1,6 @@
 // Root Plugin Build Definition
-organization := "io.ellatech"
+organization := "io.github.dfurmans"
 name := "play-auth-sso"
-version := "0.0.1-SNAPSHOT"
 scalaVersion := "3.3.7"
 
 val OidcNimbusdsSDKVersion = "11.38.2"
@@ -17,21 +16,20 @@ libraryDependencies ++= Seq(
 lazy val play_auth_sso = (project in file("."))
   .settings(
     name := "play-auth-sso",
-    version := "0.0.1-SNAPSHOT",
     scalaVersion := "3.3.7",
-    // Publishing metadata
+    // Publishing metadata required by Maven Central
     publishMavenStyle := true,
-    publishTo := sonatypePublishToBundle.value,
     licenses := Seq("Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0.txt")),
     homepage := Some(url("https://github.com/dfurmans/play-auth-sso")),
     scmInfo := Some(ScmInfo(url("https://github.com/dfurmans/play-auth-sso"), "scm:git@github.com:dfurmans/play-auth-sso.git")),
     developers := List(Developer(id = "dfurmans", name = "dfurmans", email = "dfurmans@proton.me", url = url("https://github.com/dfurmans")))
   )
 
+ThisBuild / versionScheme := Some("early-semver")
+
 lazy val example = (project in file("examples/quickstart"))
   .enablePlugins(PlayScala)
   .dependsOn(play_auth_sso)
   .settings(
-    // Reset scalacOptions to prevent duplicate flags from Play/root inheritance
     scalacOptions := Seq("-encoding", "UTF-8", "-feature")
   )
