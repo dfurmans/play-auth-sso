@@ -1,0 +1,22 @@
+services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:23.0.7
+    command: start-dev
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    ports:
+      - "8080:8080"
+    volumes:
+      - keycloak_data:/opt/keycloak/data
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'       # Maximum of 2 CPU cores
+          memory: 2G      # Maximum of 2 Gigabytes of RAM
+        reservations:
+          cpus: '0.5'       # Guarantee at least half a CPU core
+          memory: 512M    # Guarantee at least 512 Megabytes of RAM
+
+volumes:
+  keycloak_data:

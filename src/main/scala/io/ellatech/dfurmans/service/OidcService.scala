@@ -56,11 +56,11 @@ class OidcService @Inject() (configProvider: OidcConfigProvider) extends LazyLog
 
   /** Exchange the authorization code for tokens. */
   def exchangeCode(code: AuthorizationCode): Try[OIDCTokenResponse] = Try {
-    val tokenRequest = new TokenRequest(
+    val tokenRequest = new TokenRequest.Builder(
       providerMetadata.getTokenEndpointURI,
       clientAuth,
       new AuthorizationCodeGrant(code, callbackURI)
-    )
+    ).build()
     val tokenResponse = OIDCTokenResponseParser.parse(tokenRequest.toHTTPRequest.send())
     if (!tokenResponse.indicatesSuccess()) {
       val err = tokenResponse.toErrorResponse.getErrorObject

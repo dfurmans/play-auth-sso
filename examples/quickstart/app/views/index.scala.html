@@ -1,0 +1,16 @@
+@(sessionData: Map[String, String])
+
+@main("Welcome to Play") {
+  <h1>Welcome to Play!</h1>
+
+  <h2>OIDC Session Data</h2>
+  @if(sessionData.isEmpty) {
+    <p>No session data found (user may not be authenticated yet).</p>
+  } else {
+    <ul>
+    @for((key, value) <- sessionData) {
+      <li><strong>@key:</strong> @value</li>
+    }
+    </ul>
+  }
+}
