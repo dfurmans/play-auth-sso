@@ -2,7 +2,14 @@
 ThisBuild / organization := "io.github.dfurmans"
 ThisBuild / scalaVersion := "3.3.7"
 ThisBuild / versionScheme := Some("early-semver")
-ThisBuild / sonatypeCredentialHost := "s01.oss.sonatype.org" // Important for newer Sonatype accounts
+ThisBuild / sonatypeCredentialHost := "s01.oss.sonatype.org"
+
+// Explicitly route snapshots to the snapshot repo and releases to the staging repo
+ThisBuild / publishTo := {
+  val nexus = "https://s01.oss.sonatype.org/"
+  if (isSnapshot.value) Some("snapshots" at nexus + "content/repositories/snapshots")
+  else Some("releases" at nexus + "service/local/staging/deploy/maven2")
+}
 
 val OidcNimbusdsSDKVersion = "11.38.2"
 
@@ -19,7 +26,6 @@ lazy val play_auth_sso = (project in file("."))
       "org.scalatestplus.play" %% "scalatestplus-play" % "7.0.2" % Test
     ),
 
-    // Publishing metadata required by Maven Central
     publishMavenStyle := true,
     licenses := Seq("Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0.txt")),
     homepage := Some(url("https://github.com/dfurmans/play-auth-sso")),
@@ -33,6 +39,6 @@ lazy val example = (project in file("examples/quickstart"))
   .dependsOn(play_auth_sso)
   .settings(
     name := "play-auth-sso-example",
-    publish / skip := true, // Crucial: Prevents CI from trying to publish the example app
+    publish / skip := true, 
     scalacOptions := Seq("-encoding", "UTF-8", "-feature")
   )
