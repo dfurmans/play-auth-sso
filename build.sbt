@@ -1,22 +1,24 @@
-// Root Plugin Build Definition
-organization := "io.github.dfurmans"
-name := "play-auth-sso"
-scalaVersion := "3.3.7"
+// Global Build Settings
+ThisBuild / organization := "io.github.dfurmans"
+ThisBuild / scalaVersion := "3.3.7"
+ThisBuild / versionScheme := Some("early-semver")
+ThisBuild / sonatypeCredentialHost := "s01.oss.sonatype.org" // Important for newer Sonatype accounts
 
 val OidcNimbusdsSDKVersion = "11.38.2"
 
-libraryDependencies ++= Seq(
-  "org.playframework" %% "play" % "3.0.12" % Provided,
-  "com.nimbusds" % "oauth2-oidc-sdk" % OidcNimbusdsSDKVersion,
-  "com.typesafe.scala-logging" %% "scala-logging" % "3.9.6",
-  "org.playframework" %% "play-guice" % "3.0.12" % Test,
-  "org.scalatestplus.play" %% "scalatestplus-play" % "7.0.2" % Test
-)
-
+// Root Project (The Library)
 lazy val play_auth_sso = (project in file("."))
   .settings(
     name := "play-auth-sso",
-    scalaVersion := "3.3.7",
+    
+    libraryDependencies ++= Seq(
+      "org.playframework" %% "play" % "3.0.12" % Provided,
+      "com.nimbusds" % "oauth2-oidc-sdk" % OidcNimbusdsSDKVersion,
+      "com.typesafe.scala-logging" %% "scala-logging" % "3.9.6",
+      "org.playframework" %% "play-guice" % "3.0.12" % Test,
+      "org.scalatestplus.play" %% "scalatestplus-play" % "7.0.2" % Test
+    ),
+
     // Publishing metadata required by Maven Central
     publishMavenStyle := true,
     licenses := Seq("Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0.txt")),
@@ -25,11 +27,12 @@ lazy val play_auth_sso = (project in file("."))
     developers := List(Developer(id = "dfurmans", name = "dfurmans", email = "dfurmans@proton.me", url = url("https://github.com/dfurmans")))
   )
 
-ThisBuild / versionScheme := Some("early-semver")
-
+// Example Project (The App)
 lazy val example = (project in file("examples/quickstart"))
   .enablePlugins(PlayScala)
   .dependsOn(play_auth_sso)
   .settings(
+    name := "play-auth-sso-example",
+    publish / skip := true, // Crucial: Prevents CI from trying to publish the example app
     scalacOptions := Seq("-encoding", "UTF-8", "-feature")
   )
