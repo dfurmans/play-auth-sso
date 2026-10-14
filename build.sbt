@@ -18,7 +18,6 @@ lazy val play_auth_sso = (project in file("."))
       "org.scalatestplus.play" %% "scalatestplus-play" % "7.0.2" % Test
     ),
 
-    publishMavenStyle := true,
     licenses := Seq("Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0.txt")),
     homepage := Some(url("https://github.com/dfurmans/play-auth-sso")),
     scmInfo := Some(ScmInfo(url("https://github.com/dfurmans/play-auth-sso"), "scm:git@github.com:dfurmans/play-auth-sso.git")),
