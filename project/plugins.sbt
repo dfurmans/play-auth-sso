@@ -1,5 +1,5 @@
 addSbtPlugin("org.playframework" % "sbt-plugin" % "3.0.12")
-addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "3.12.2")
 addSbtPlugin("com.github.sbt" % "sbt-ci-release" % "1.12.0")
 addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.5.2")
 addSbtPlugin("org.typelevel" % "sbt-tpolecat" % "0.5.2")
+// Do NOT add sbt-sonatype
