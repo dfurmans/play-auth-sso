@@ -2,14 +2,9 @@
 ThisBuild / organization := "io.github.dfurmans"
 ThisBuild / scalaVersion := "3.3.7"
 ThisBuild / versionScheme := Some("early-semver")
-ThisBuild / sonatypeCredentialHost := "s01.oss.sonatype.org"
 
-// Explicitly route snapshots to the snapshot repo and releases to the staging repo
-ThisBuild / publishTo := {
-  val nexus = "https://s01.oss.sonatype.org/"
-  if (isSnapshot.value) Some("snapshots" at nexus + "content/repositories/snapshots")
-  else Some("releases" at nexus + "service/local/staging/deploy/maven2")
-}
+// Tell sbt-sonatype to use the new Central Portal
+ThisBuild / sonatypeCredentialHost := sonatypeCentralHost
 
 val OidcNimbusdsSDKVersion = "11.38.2"
 
