@@ -1,5 +1,8 @@
 # Play Auth SSO module
 
+[![Maven Central Version](https://img.shields.io/maven-central/v/io.github.dfurmans/play-auth-sso_3)](https://central.sonatype.com/artifact/io.github.dfurmans/play-auth-sso_3)
+
+
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 A thin, pluggable Play Framework (Scala 3, Play 3.0.x / Pekko) module for
