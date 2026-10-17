@@ -33,7 +33,7 @@ you need custom session/authorization logic.
 1. **Add the dependency** (auto-registers, no module wiring needed):
 
    ```scala
-   libraryDependencies += "io.ellatech" %% "play-auth-sso" % "1.0.0-SNAPSHOT"
+   libraryDependencies += "io.ellatech" %% "play-auth-sso" % "latest.release"
    ```
 
 2. **Configure your IdP** in `conf/application.conf`:
