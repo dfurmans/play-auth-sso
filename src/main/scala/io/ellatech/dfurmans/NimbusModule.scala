@@ -3,7 +3,7 @@ package io.ellatech.dfurmans
 import play.api.inject.{Binding, Module}
 import play.api.{Configuration, Environment}
 
-import io.ellatech.dfurmans.spi.{DefaultSessionCreator, SessionCreator}
+import io.ellatech.dfurmans.spi.{DefaultIdTokenStore, DefaultSessionCreator, IdTokenStore, SessionCreator}
 
 /** Guice module. Binds the default `SessionCreator`; a host application
   * overrides it by binding its own implementation (last binding wins).
@@ -13,6 +13,7 @@ class NimbusModule extends Module {
 
   override def bindings(environment: Environment, configuration: Configuration): Seq[Binding[?]] =
     Seq(
-      bind[SessionCreator].to[DefaultSessionCreator]
+      bind[SessionCreator].to[DefaultSessionCreator],
+      bind[IdTokenStore].to[DefaultIdTokenStore]
     )
 }
