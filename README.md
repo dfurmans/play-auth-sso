@@ -200,12 +200,21 @@ nimbus.oidc {
 | --- | --- | --- |
 | `nimbus.oidc.issuer` | OIDC issuer URL | `""` |
 | `nimbus.oidc.client_id` | OIDC client id | `""` |
-| `nimbus.oidc.client_secret` | OIDC client secret (plain string) | `""` |
+| `nimbus.oidc.client_secret` | OIDC client secret (required; no default, can be supplied via the `OIDC_CLIENT_SECRET` env var) | `""` |
 | `nimbus.oidc.callback_url` | Absolute callback URL registered with the IdP | `""` |
 | `nimbus.oidc.post_login_url` | Redirect target after successful login | `"/"` |
 | `nimbus.oidc.post_logout_url` | Redirect target after logout | `"/"` |
 | `nimbus.oidc.scopes` | OIDC scopes requested at login | `["openid","profile","email"]` |
 | `nimbus.oidc.session_claims` | ID-token claims copied into the session | `["email","name"]` |
+
+Startup fails fast if `issuer`, `client_id`, `client_secret` or `callback_url` is empty,
+or if `issuer` / `callback_url` is not an absolute URI. Blocking IdP calls run on the
+`nimbus.blocking-dispatcher` pool (16 threads by default, override in `application.conf`).
+The login flow uses PKCE (S256). The raw ID token is kept server-side in an `IdTokenStore`
+(only an opaque key, `oidc_sid`, is placed in the session) so logout can send an `id_token_hint`.
+The default store is in-memory with a TTL (`nimbus.oidc.id_token_ttl`, default 8 hours); it is lost
+on restart and not shared between nodes, in which case logout proceeds without a hint. Bind your own
+`IdTokenStore` (e.g. Redis) for multi-node deployments.
 
 ## 3. Add the routes
 

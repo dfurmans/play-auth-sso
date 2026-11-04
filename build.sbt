@@ -17,7 +17,9 @@ lazy val play_auth_sso = (project in file("."))
       "org.playframework" %% "play-guice" % "3.0.12" % Test,
       "org.scalatestplus.play" %% "scalatestplus-play" % "7.0.2" % Test
     ),
-
+    scalacOptions ++= Seq(
+      "-Wconf:msg=unused value of type org.scalatest.Assertion:s"
+    ),
     licenses := Seq("Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0.txt")),
     homepage := Some(url("https://github.com/dfurmans/play-auth-sso")),
     scmInfo := Some(ScmInfo(url("https://github.com/dfurmans/play-auth-sso"), "scm:git@github.com:dfurmans/play-auth-sso.git")),
@@ -31,5 +33,10 @@ lazy val example = (project in file("examples/quickstart"))
   .settings(
     name := "play-auth-sso-example",
     publish / skip := true, 
-    scalacOptions := Seq("-encoding", "UTF-8", "-feature")
+    scalacOptions := Seq(
+           "-encoding",
+           "UTF-8",
+           "-feature",
+           "-Wconf:msg=unused value of type org.scalatest.Assertion:s"
+           )
   )

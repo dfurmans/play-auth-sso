@@ -34,10 +34,10 @@ class DefaultSessionCreator @Inject() (configProvider: OidcConfigProvider) exten
     val cfg = configProvider.config
 
     val base: Seq[(String, String)] = Seq("sub" -> claims.getSubject)
-    val extra: Seq[(String, String)] = cfg.sessionClaims.flatMap { name =>
+    val extra: Seq[(String, String)] = cfg.sessionClaims.map(_.value).flatMap { name =>
       Option(claims.getClaim(name)).map(v => name -> String.valueOf(v))
     }
 
-    Results.Redirect(cfg.postLoginUrl).withSession((base ++ extra)*)
+    Results.Redirect(cfg.postLoginUrl.value).withSession((base ++ extra)*)
   }
 }
