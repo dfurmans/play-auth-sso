@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased] 2026-11-04
+## [0.0.2] 2026-11-04
 
 ### Changed
 - `OidcConfig` fields are now Scala 3 opaque types (`Issuer`, `ClientId`, `CallbackUrl`, `PostLoginUrl`, `PostLogoutUrl`, `OidcScope`, `ClaimName`) instead of bare `String`/`Seq[String]`. `clientSecret` is a dedicated `ClientSecret` case class whose `toString` redacts the value so it can't leak into logs.
