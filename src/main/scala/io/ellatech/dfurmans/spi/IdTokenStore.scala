@@ -9,7 +9,6 @@ import java.util.concurrent.atomic.AtomicReference
 import javax.inject.{Inject, Singleton}
 
 import scala.concurrent.duration.FiniteDuration
-import scala.jdk.CollectionConverters.*
 
 import play.api.Configuration
 
