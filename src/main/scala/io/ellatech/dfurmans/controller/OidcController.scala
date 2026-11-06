@@ -56,7 +56,14 @@ class OidcController @Inject() (
       Redirect(authUrl.toString).withSession(
         request.session + (StateKey -> state.getValue) + (NonceKey -> nonce.getValue) + (PkceKey -> verifier.getValue)
       )
-    }
+    }.recover { case ex =>
+      val issuer = configProvider.config.issuer.value
+      logger.warn("Could not start OIDC login: provider '{}' is unreachable: {}", issuer, ex.getMessage)
+      ServiceUnavailable(
+        s"OIDC provider is not available. Could not reach '$issuer' to start login. " +
+          "Check that the identity provider is running and that nimbus.oidc.issuer is correct."
+      )
+    }(ec)
   }
 
   /** Handle the IdP callback: verify state, exchange code, validate ID token. */
@@ -109,17 +116,43 @@ class OidcController @Inject() (
     }
   }
 
-  /** Clear the session and redirect to the IdP end-session endpoint if present. */
+  /** Clear the session (cookie and server-side ID-token store) and redirect to
+    * the IdP end-session endpoint so the IdP terminates its own SSO session too.
+    */
   def logout: Action[AnyContent] = Action.async { implicit request =>
     val storeKey    = request.session.get(IdTokenKeySessionKey)
     val idTokenHint = storeKey.flatMap(idTokenStore.get).getOrElse("")
+    // Destroy the server-side state up front so logout cleans up regardless of
+    // what the IdP does with the redirect.
     storeKey.foreach(idTokenStore.remove)
-    Future(oidcService.buildLogoutUrl(idTokenHint))(blockingEc).map {
+
+    val postLogoutUrl = configProvider.config.postLogoutUrl.value
+    // The IdP requires an absolute post_logout_redirect_uri; resolve a relative
+    // configured value against the current request's host.
+    val absolutePostLogoutUrl = absoluteUrl(postLogoutUrl)
+
+    Future(oidcService.buildLogoutUrl(absolutePostLogoutUrl, idTokenHint))(blockingEc).map {
       case Some(uri) =>
         logger.info("Logging out via IdP end-session endpoint")
         Redirect(uri.toString).withNewSession
       case None =>
-        Redirect(configProvider.config.postLogoutUrl.value).withNewSession
-    }
+        logger.info("IdP advertises no end-session endpoint; clearing local session only")
+        Redirect(postLogoutUrl).withNewSession
+    }.recover { case ex =>
+      // The IdP is unreachable: the local session is already destroyed, so
+      // degrade to a clean local logout instead of a raw error page.
+      logger.warn("Could not reach IdP end-session endpoint; clearing local session only: {}", ex.getMessage)
+      Redirect(postLogoutUrl).withNewSession
+    }(ec)
   }
+
+  /** Resolve a possibly-relative URL to an absolute one against the current
+    * request's host, leaving already-absolute URLs unchanged.
+    */
+  private def absoluteUrl(url: String)(implicit request: RequestHeader): String =
+    if (url.startsWith("http://") || url.startsWith("https://")) url
+    else {
+      val scheme = if (request.secure) "https" else "http"
+      s"$scheme://${request.host}$url"
+    }
 }
