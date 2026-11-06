@@ -105,10 +105,16 @@ class OidcService @Inject() (configProvider: OidcConfigProvider) extends LazyLog
     idToken.getJWTClaimsSet
   }
 
-  /** Build the IdP end-session (logout) URL, if the provider advertises one. */
-  def buildLogoutUrl(idTokenHint: String): Option[URI] =
+  /** Build the IdP end-session (logout) URL, if the provider advertises one.
+    *
+    * `postLogoutRedirectUri` must be an absolute URL registered with the IdP as
+    * a valid post-logout redirect; IdPs such as Keycloak reject a relative or
+    * unregistered value with "Invalid redirect uri" and refuse to end the
+    * session.
+    */
+  def buildLogoutUrl(postLogoutRedirectUri: String, idTokenHint: String): Option[URI] =
     Option(providerMetadata.getEndSessionEndpointURI).map { endSession =>
-      OidcService.logoutUri(endSession, cfg.postLogoutUrl.value, idTokenHint)
+      OidcService.logoutUri(endSession, postLogoutRedirectUri, idTokenHint)
     }
 }
 

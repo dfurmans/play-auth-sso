@@ -365,6 +365,55 @@ class AppModule extends Module {
 }
 ```
 
+## Multi-node deployments (IdTokenStore SPI)
+
+The raw ID token is held server-side in an `IdTokenStore` so logout can send it
+to the IdP as `id_token_hint`; only an opaque key (`oidc_sid`) travels in the
+session cookie. The default `DefaultIdTokenStore` is **in-memory**: entries are
+lost on restart and are **not shared between nodes**.
+
+On a single node this is fine. On a multi-node deployment behind a load
+balancer, if a user logs in on node A and later logs out on node B, node B has
+no entry for that key, so `id_token_hint` is omitted from the logout request.
+Logout still succeeds and the local session is destroyed, but without the hint
+the IdP cannot silently identify the session — Keycloak, for example, shows a
+"Do you want to log out?" confirmation page instead of logging out straight
+away.
+
+For multi-node deployments, bind a shared `IdTokenStore` (Redis, a database, or
+any store reachable from every node). Guice's last-binding-wins makes your
+binding override the default:
+
+```scala
+package modules
+
+import javax.inject.{Inject, Singleton}
+import io.ellatech.dfurmans.spi.IdTokenStore
+
+@Singleton
+class RedisIdTokenStore @Inject() (/* your Redis client */) extends IdTokenStore {
+  override def put(idToken: String): String = ??? // store, return opaque key
+  override def get(key: String): Option[String] = ??? // look up by key
+  override def remove(key: String): Unit = ??? // delete by key
+}
+```
+
+```scala
+package modules
+
+import play.api.inject.{Binding, Module}
+import play.api.{Configuration, Environment}
+import io.ellatech.dfurmans.spi.IdTokenStore
+
+class AppModule extends Module {
+  def bindings(env: Environment, conf: Configuration): Seq[Binding[?]] =
+    Seq(bind[IdTokenStore].to[RedisIdTokenStore])
+}
+```
+
+Give the store a TTL at least as long as your session lifetime so the token
+outlives the session it belongs to.
+
 ## License
 
 Apache License 2.0.
